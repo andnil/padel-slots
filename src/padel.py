@@ -51,10 +51,10 @@ class Padel:
             r = requests.get(self.__base_url, params=payload)
             result = r.json()
             available_slots = []
-            
+
             for court in result:
                 for slot in court['slots']:
-                    
+
                     utc = datetime.strptime(
                         f'{date} {slot["start_time"]}', '%Y-%m-%d %H:%M:%S')
 
@@ -63,22 +63,21 @@ class Padel:
                     local_time = utc.astimezone(to_zone)
                     if slot['duration'] == 60:
                         available_slots.append(
-                        {
-                            'name': courts_map[court['resource_id']],
-                            'start_date': local_time.strftime('%Y-%m-%d'),
-                            'start_time': local_time.strftime('%H:%M'),
-                            'duration': slot['duration'],
-                            'price': slot['price']
-                        })
+                            {
+                                'name': courts_map[court['resource_id']],
+                                'start_date': local_time.strftime('%Y-%m-%d'),
+                                'start_time': local_time.strftime('%H:%M'),
+                                'duration': slot['duration'],
+                                'price': slot['price']
+                            })
 
-            
-            sorted_available_slots = sorted(available_slots, key=itemgetter('start_date'))
-            for key, group in itertools.groupby(sorted_available_slots, key=lambda x:x['start_date']):
+            sorted_available_slots = sorted(
+                available_slots, key=itemgetter('start_date'))
+            for key, group in itertools.groupby(sorted_available_slots, key=lambda x: x['start_date']):
                 slot_list = []
                 for slot in sorted(list(group), key=itemgetter('start_time')):
                     slot_list.append(slot)
 
                 response[key] = slot_list
 
-        
         return response
